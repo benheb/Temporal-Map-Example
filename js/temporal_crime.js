@@ -39,7 +39,7 @@
         timeExtent.startTime = new Date("2002/06/01 00:04:00 UTC");
         timeExtent.endTime = new Date("2002/06/29 23:59:00 UTC");
         timeSlider.setThumbCount(2);
-        timeSlider.createTimeStopsByTimeInterval(timeExtent,2,'esriTimeUnits');
+        timeSlider.createTimeStopsByTimeInterval(timeExtent,2,'esriTimeUnitsDays');
         timeSlider.setThumbIndexes([0,1]);
         timeSlider.setThumbMovingRate(2000);
         timeSlider.startup();
