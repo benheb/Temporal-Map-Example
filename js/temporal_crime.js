@@ -1,4 +1,5 @@
       dojo.require("esri.map");
+      dojo.require("dojo.io.script");
       dojo.require("esri.dijit.TimeSlider");
 
 		  var timeSlider; 
@@ -26,8 +27,29 @@
         
         //Test queries!
         //total count for mapservicelayer
-        //var testLayer = new esri.layers.ArcGISDynamicMapServiceLayer("http://ec2-23-22-185-186.compute-1.amazonaws.com:6080/arcgis/rest/services/PhillyCrime/MapServer/0/query?where=1=1&returnCountOnly=true&f=json");
-        //console.log('testLayer', testLayer)
+
+         //function searchGoogle(){
+           // Look up the node we'll stick the text under.
+           var targetNode = dojo.byId("totalcount");
+        
+           // The parameters to pass to xhrGet, the url, how to handle it, and the callbacks.
+           var jsonpArgs = {
+             url: "http://ec2-23-22-185-186.compute-1.amazonaws.com:6080/arcgis/rest/services/PhillyCrime/MapServer/0/query?where=1=1&returnCountOnly=true&f=json",
+             callbackParamName: "callback",
+             content: {
+               v: "1.0",
+               q: "dojo toolkit"
+             },
+             load: function(data){
+               console.log('data', data['count'])
+               // Set the data from the search into the viewbox in nicely formatted JSON
+               targetNode.innerHTML = "<pre>" + data['count'] + "</pre>";
+             },
+             error: function(error){
+               targetNode.innerHTML = "An unexpected error occurred: " + error;
+             }
+           };
+           dojo.io.script.get(jsonpArgs);
       }
 
       function initSlider(results) {
