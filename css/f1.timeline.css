@@ -1,0 +1,434 @@
+
+div#chartsContainer {
+  width: 100%;
+  height: 100%;
+  padding-bottom:3px;
+}
+div#overviews {
+  position: relative;
+  width: 700px;
+  height: 35px;
+  border-right: 1px #666 solid;
+  border-left: 1px #666 solid;
+}
+
+div#overview, div#overviewBlockers, div#overviewAnnotation {
+  width: 700px;
+  height: 35px;
+}
+
+div#overviewBlockers, div#overviewAnnotation {
+  position: absolute;
+  top: 0;
+}
+
+div#overviewBlockers, div#overviewAnnotation {
+  pointer-events:none;
+}
+
+div#focusChartHolder {
+  width: 700px;
+  height: 90px;
+  margin-left: auto;
+  margin-right: auto;
+  
+  position: relative;
+}
+
+div#focus, div#focusAnnotation {
+  width: 700px;
+  height: 90px;
+  
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+div#focus {
+  border-right: 1px #666 solid;
+  border-left: 1px #666 solid;
+  border-bottom: 1px #f00 solid;
+}
+
+div#focusContainer {
+  height: 90px;
+  overflow:hidden;
+  margin-top: 2px;
+}
+
+div#overviewContainer {
+  width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 10px;
+  padding-right:10px;
+}
+
+div#focusRange {
+  color: #999;
+  font-size: 14px;
+  font-family: Helvetica;
+  margin-right: 10px;
+  position:relative;
+  top:7px;
+  text-align:right;
+  float:right;
+}
+
+button#hideOverview {
+  width: 31px;
+  height: 18px;
+  cursor:pointer;
+  overflow: visible;
+  border: none;
+  float: left;
+  background-image: url("/timeline/images/hide.png");
+  margin-right: 5px;
+  margin-top:0px;
+}
+
+div#playModeChooser {
+  margin-top: 4px;
+}
+
+button#hideOverview:hover {
+  background-image: url("/timeline/images/hide_over.png");
+}
+
+button#hideOverview.show {
+  width: 37px;
+  background-image: url("/timeline/images/show.png");
+}
+
+button#hideOverview.show:hover {
+  background-image: url("/timeline/images/show_over.png");
+}
+
+
+button#play {
+  border: none;
+  background: none;
+  cursor: pointer;
+  float: left;
+}
+div#playInternal {
+  width: 18px;
+  height: 18px;
+  overflow: visible;
+  border: none;
+  margin-top: 3px;
+  background-image: url("/timeline/images/play.png");  
+  float: left;
+}
+
+.play{
+  cursor: pointer;
+}
+
+div#playInternal.pause {
+  background-image: url("/timeline/images/pause.png");
+}
+
+button#play:hover div#playInternal {
+  background-image: url("/timeline/images/play_over.png");  
+}
+
+button#play:hover div#playInternal.pause {
+  background-image: url("/timeline/images/pause_over.png");
+}
+
+button#play:hover h1#temporalTitle {
+  color: black;
+}
+
+button#page_left, button#page_right {
+  width: 18px;
+  height: 31px;
+  cursor: pointer;
+  overflow:visible;
+  margin-top: 30px;
+  border:0px solid;
+}
+
+button#page_left {
+  position: absolute;
+  right: 6px;
+}
+
+button#page_right {
+  margin-left: 6px;
+}
+
+button#page_left {
+  background-image: url("/timeline/images/page_left.png");  
+}
+
+button#page_right {
+  background-image: url("/timeline/images/page_right.png"); 
+}
+
+button#page_right:hover {
+  background-image: url("/timeline/images/page_right_over.png"); 
+}
+
+button#page_left:hover {
+  background-image: url("/timeline/images/page_left_over.png"); 
+}
+
+div#focusContainer {
+  width: 750px;
+  position: relative;
+}
+
+div#focusControls {
+  width: 760px;
+  height: 30px;
+  /*line-height: 32px;*/
+  background: #dcdcdc; /* for non-css3 browsers */
+  border-bottom: 1px solid #989898;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#CCCCCC', GradientType=0); /* for IE */
+  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#CCC)); /* for webkit browsers */
+  background: -moz-linear-gradient(top,  #fff,  #CCC); /* for firefox 3.6+ */
+}
+#focusControl .header {
+}
+div#overviewControls {
+  height: 18px;
+  position: relative;
+  margin-top: 1px;
+  padding-left: 25px;
+}
+
+div#focusControls {
+  position: relative;
+}
+
+div#pageHolder_left, div#pageHolder_right {
+  width: 25px;
+  height: 100%;
+  overflow:visible;
+}
+
+div#pageHolder_left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  
+  box-shadow: 6px 0px 10px 1px rgba(0,0,0,.4);
+  -moz-box-shadow: 6px 0px 10px 1px rgba(0,0,0,.4);
+  -webkit-box-shadow: 6px 0px 10px 1px rgba(0,0,0,.4);
+}
+
+div#pageHolder_right {
+  position: absolute;
+  right: -2px;
+  top: 0;
+  
+  box-shadow: -6px 0px 10px 1px rgba(0,0,0,.4);
+  -moz-box-shadow: -6px 0px 10px 1px rgba(0,0,0,.4);
+  -webkit-box-shadow: -6px 0px 10px 1px rgba(0,0,0,.4);
+}
+
+div#resolutionChooser {
+  position: absolute;
+  right: 12px;
+  top: 5px;
+}
+
+.fg-buttonset { float:left; }
+.fg-buttonset .fg-button { float: left; }
+.fg-buttonset-single .fg-button, 
+.fg-buttonset-multi .fg-button { margin-right: -1px;}
+
+button.fg-button {
+  cursor: pointer;
+}
+
+button.fg-button.ui-state-active {
+  cursor:auto;
+}
+
+
+h1#temporalTitle {
+  width:40px;
+  position:relative;
+  top:8px;  
+}
+
+h1#temporalTitle, h1#overviewTitle, p#overviewRange {
+  color: #999;
+  font-family: Helvetica;
+  font-size: 12px;
+  font-weight:normal;
+  margin-bottom: 0;
+  float: left;
+  margin-right: 6px;
+  margin-top: 2px;
+}
+div#temporalTitle {
+  color: #999;
+  font-family: Helvetica;
+  font-size: 12px;
+  font-weight:normal;
+  margin-bottom: 0;
+  float: left;
+  margin-right: 6px;
+  vertical-align: top;
+  margin-left:3px; 
+}
+g.chart.highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+div#temporal {
+  width: 760px;
+  height: 189px;
+}
+
+div#temporal_controls {
+  background-color: white;
+  box-shadow: 4px 2px 4px 1px rgba(0,0,0,.4);
+  -moz-box-shadow: 4px 2px 5px 1px rgba(0,0,0,.4);
+  -webkit-box-shadow: 4px 2px 5px 1px rgba(0,0,0,.4);
+}
+
+button#show_hide {
+  width: 15px;
+  height: 16px;
+  cursor:pointer;
+  overflow: visible;
+  border: none;
+  float: right;
+  margin-right:4px;
+  margin-top: 4px;
+}
+
+
+button#show_hide.show {
+  background-image: url("/timeline/images/max.png");
+}
+
+button#show_hide.show:hover {
+  background-image: url("/timeline/images/max_over.png");
+}
+
+button#show_hide.hide {
+  background-image: url("/timeline/images/min.png");
+}
+
+button#show_hide.hide:hover {
+  background-image: url("/timeline/images/min_over.png");
+}
+
+button.fg-button {
+  border-radius: 0;
+  border: 1px solid #ccc;
+  background-color: white !important;
+  line-height:15px;
+}
+
+button.ui-state-active {
+  background: #98D48B;
+  background: -moz-linear-gradient(top, #98D48B 0%, #4CA035 10%, #2E7A0F 50%, #1E6B00 50%, #194C00 100%);
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#98D48B), color-stop(10%,#4CA035), color-stop(50%,#2E7A0F), color-stop(50%,#1E6B00), color-stop(100%,#194C00));
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#98D48B', endColorstr='#1D5A00',GradientType=0 ); BACKGROUND: #98d48b
+  /*background-color: #98D48B !important;
+  background: #98D48B !important;*/ 
+  color: white;
+}
+
+button.ui-state-disabled {
+  background-color: #ddd !important;
+  background: #ddd !important;
+  color: #999;
+  cursor: auto;
+}
+
+button.ui-corner-left {
+  border-bottom-left-radius: 5px;
+  padding-top:1px;
+  border-top-left-radius: 5px;
+  max-height:20px;
+}
+
+button.ui-corner-right {
+  border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
+  max-height:20px;
+}
+
+div#focusTip { 
+  border: 1px solid #09c;
+  background-color: #fff;
+  
+  /*
+  min-width: 100px;
+  min-height: 19px;
+  */
+  
+  position: absolute;
+  
+  top: 10px;
+  left: 10px;
+  
+  box-shadow: 2px 2px 2px 1px rgba(0,0,0,.2);
+  -moz-box-shadow: 2px 2px 2px 1px rgba(0,0,0,.2);
+  -webkit-box-shadow: 2px 2px 2px 1px rgba(0,0,0,.2);
+  
+  display: none;
+  
+  padding: 3px;
+}
+
+span.dateText {
+  color: #444;
+}
+
+
+/**
+ *  slider stuff
+ */
+
+div#overviewSlider {
+  width: 100%;
+  height: 0px;
+  background-color: transparent;
+  position: absolute;
+  bottom: 10px;
+  
+  border: none !important;
+}
+
+/*
+ * jQuery UI Slider 1.8.13
+ *
+ * Copyright 2011, AUTHORS.txt (http://jqueryui.com/about)
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * http://docs.jquery.com/UI/Slider#theming
+ */
+.ui-slider { position: relative; text-align: left; }
+.ui-slider .ui-slider-handle { position: absolute; z-index: 2; width: 1.2em; height: 1.2em; cursor: default; }
+.ui-slider .ui-slider-range { position: absolute; z-index: 1; font-size: .7em; display: block; border: 0; background-position: 0 0; }
+
+.ui-slider-horizontal { height: .8em; }
+.ui-slider-horizontal .ui-slider-handle { top: -.3em; margin-left: -.6em; }
+.ui-slider-horizontal .ui-slider-range { 
+  top: 6px; height: 8px !important; background-color: #eee; 
+  
+  border-top: 1px solid #999 !important;
+  border-bottom: 1px solid #999 !important;
+  
+  cursor:hand;
+}
+.ui-slider-horizontal .ui-slider-range-min { left: 0; }
+.ui-slider-horizontal .ui-slider-range-max { right: 0; }
+
+.ui-slider-vertical { width: .8em; height: 100px; }
+.ui-slider-vertical .ui-slider-handle { left: -.3em; margin-left: 0; margin-bottom: -.6em; }
+.ui-slider-vertical .ui-slider-range { left: 0; width: 100%; }
+.ui-slider-vertical .ui-slider-range-min { bottom: 0; }
+.ui-slider-vertical .ui-slider-range-max { top: 0; }
