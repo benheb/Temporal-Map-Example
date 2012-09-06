@@ -285,6 +285,7 @@ g.chart.highlight {
 div#temporal {
   width: 760px;
   height: 189px;
+  display:none;
 }
 
 div#temporal_controls {
