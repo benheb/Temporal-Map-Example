@@ -41,14 +41,14 @@
         timeSlider.setThumbCount(2);
         timeSlider.createTimeStopsByTimeInterval(timeExtent,2,'esriTimeUnitsDays');
         timeSlider.setThumbIndexes([0,1]);
-        timeSlider.setThumbMovingRate(2000);
+        timeSlider.setThumbMovingRate(200);
         timeSlider.startup();
         
         //add labels for every other time stop
         var labels = dojo.map(timeSlider.timeStops, function(timeStop,i){
 					var s = ""; 
           if(i%2 === 0){
-            s = timeStop.getDate(); 
+            s = timeStop.getMonth() + "/" + timeStop.getDay() + "/" + timeStop.getYear(); 
           }
           return s;
         });      
