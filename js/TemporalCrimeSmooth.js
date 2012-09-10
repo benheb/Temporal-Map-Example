@@ -23,7 +23,7 @@
         crimeLayer.maxRecordCount = 100000;
 
         // Styling the Categories
-        var markerOpacity = 250;
+        var markerOpacity = 180;
         
         var categoryColors = {red: [215, 0, 0, markerOpacity], green: [34, 150, 94, markerOpacity], blue: [51, 137, 186, markerOpacity]}
         var categories = [{code: 100, label: "Homicide", color: "red"},
@@ -134,7 +134,7 @@
         timeExtent.endTime = new Date("2002/06/29 23:59:00 UTC");
         timeSlider.setThumbCount(2);
         timeSlider.createTimeStopsByTimeInterval(timeExtent,7,'esriTimeUnitsHours');
-        timeSlider.setThumbIndexes([0,1]);
+        timeSlider.setThumbIndexes([0,5]);
         timeSlider.setThumbMovingRate(200);
         timeSlider.numberBins = timeSlider.timeStops.length-1;
         timeSlider.bins = [];
