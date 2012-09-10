@@ -75,9 +75,9 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
   _resolutions: {
     "second"  : 1000,
     "minute"  : 1000*60,
-    "hour"    : 1000*60*60,
-    "day"     : 1000*60*60*24,
-    "month"   : 1000*60*60*24*30,
+    "esriTimeUnitsHours"    : 1000*60*60,
+    "esriTimeUnitsDays"     : 1000*60*60*24,
+    "esriTimeUnitsMonths"   : 1000*60*60*24*30,
     "year"    : 1000*60*60*24*365
   },
   
@@ -126,32 +126,61 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
   
   _wire: function() {
     var self = this;
-    console.log('wire buttons')
-    var play = dojo.byId("playInternal");
+    
+    var play = dojo.byId("play");
     dojo.connect(play, "onclick", function(e) {
       self._onPlay();
     });
+    
     var next = dojo.byId("page_right");
     dojo.connect(next, "onclick", function(e) {
       self._onNext();
     });
+    
     var prev = dojo.byId("page_left");
     dojo.connect(prev, "onclick", function(e) {
       self._onPrev();
+    });
+    
+    var range = dojo.byId( "rangeMode" )
+    dojo.connect(range, "onclick", function( event ) {
+      self.setPlayMode( event.target.value );
+    });
+    
+    var cumulative = dojo.byId( "cumulativeMode" )
+    dojo.connect(cumulative, "onclick", function( event ) {
+      self.setPlayMode( event.target.value );
     });
   },
   
   _onTemporalReady: function( ) {
     var bins = timeSlider.bins;
-    var res = 'day';
+    var res = timeSlider._timeIntervalUnits;
     this.overviewResolution = res;
     
     this.overviewTimespan.min = bins[0].utc;
     this.overviewTimespan.max = bins[bins.length-1].utc;
-    console.log('timspane', this.overviewTimespan)
+    
+    dojo.byId('overviewRangeSpan').innerHTML = bins[0].timestamp + ' - ' +  bins[bins.length-1].timestamp
     
     this._addBins(bins, res);
     this._drawOverview();
+  },
+  
+  setPlayMode : function( mode ) {
+    var self = this;
+    this._playMode = mode;
+    if (mode == 'range') {
+      dojo.query(".range-mode").addClass("ui-state-active");
+      dojo.query(".cumulative-mode").removeClass("ui-state-active");
+      this.thumbCount = 2;
+      this._createSlider();
+    } else {
+      dojo.query(".cumulative-mode").addClass("ui-state-active");
+      dojo.query(".range-mode").removeClass("ui-state-active");
+      this.thumbCount = 1;
+      this._createSlider();
+    }
   },
   
   /****************

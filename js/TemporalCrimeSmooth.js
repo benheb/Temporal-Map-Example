@@ -133,7 +133,7 @@
         timeExtent.startTime = new Date("2002/06/01 00:04:00 UTC");
         timeExtent.endTime = new Date("2002/06/29 23:59:00 UTC");
         timeSlider.setThumbCount(2);
-        timeSlider.createTimeStopsByTimeInterval(timeExtent,7,'esriTimeUnitsDays');
+        timeSlider.createTimeStopsByTimeInterval(timeExtent,7,'esriTimeUnitsHours');
         timeSlider.setThumbIndexes([0,1]);
         timeSlider.setThumbMovingRate(1000);
         timeSlider.numberBins = timeSlider.timeStops.length-1;
@@ -181,7 +181,7 @@
         //add labels for every other time stop
         var labels = dojo.map(timeSlider.timeStops, function(timeStop,i){ 
           if(i%2 === 0){
-            return timeStop.getUTCFullYear(); }
+            return timeStop.getUTCHours(); }
           else{
             return "";
           }
