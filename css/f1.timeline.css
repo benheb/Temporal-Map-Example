@@ -112,6 +112,7 @@ button#play {
   float: left;
 }
 .tsPlayButton{
+  background-position: 0px 0px  !important;
   width: 18px !important;
   height: 18px !important;
   overflow: visible !important;

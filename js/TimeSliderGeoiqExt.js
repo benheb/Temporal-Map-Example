@@ -83,7 +83,7 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
   
   initSlider: function() {
     this.inherited(arguments);
-    console.log('is here now')
+    this._wire();
     this._isPlaying = false;
     this._isDragging = false;
     //this._playMode = this.options.playMode;
@@ -122,6 +122,23 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
     }
     
     this.inherited(arguments);
+  },
+  
+  _wire: function() {
+    var self = this;
+    console.log('wire buttons')
+    var play = dojo.byId("playInternal");
+    dojo.connect(play, "onclick", function(e) {
+      self._onPlay();
+    });
+    var next = dojo.byId("page_right");
+    dojo.connect(next, "onclick", function(e) {
+      self._onNext();
+    });
+    var prev = dojo.byId("page_left");
+    dojo.connect(prev, "onclick", function(e) {
+      self._onPrev();
+    });
   },
   
   _onTemporalReady: function( ) {
@@ -420,11 +437,11 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
    * Internal Methods
    *******************/
   _updateUI: function() {
-    dojo.removeClass(this.playPauseBtn.iconNode, this._iconClass);
-    this._iconClass = this.playing ? "tsButton tsPauseButton" : "tsButton tsPlayButton";
-    dojo.addClass(this.playPauseBtn.iconNode, this._iconClass);
-    this.previousBtn.set('disabled', this.playing);
-    this.nextBtn.set('disabled', this.playing);
+    //dojo.removeClass(this.playPauseBtn.iconNode, this._iconClass);
+    //this._iconClass = this.playing ? "tsButton tsPauseButton" : "tsButton tsPlayButton";
+    //dojo.addClass(this.playPauseBtn.iconNode, this._iconClass);
+    //this.previousBtn.set('disabled', this.playing);
+    //this.nextBtn.set('disabled', this.playing);
   },
   
   _createSlider: function() {

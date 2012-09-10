@@ -92,6 +92,7 @@
              }
            };
            dojo.io.script.get(getCounts);
+           
         }
         
         //add labels for every other time stop
