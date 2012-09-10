@@ -135,7 +135,7 @@
         timeSlider.setThumbCount(2);
         timeSlider.createTimeStopsByTimeInterval(timeExtent,7,'esriTimeUnitsHours');
         timeSlider.setThumbIndexes([0,1]);
-        timeSlider.setThumbMovingRate(1000);
+        timeSlider.setThumbMovingRate(200);
         timeSlider.numberBins = timeSlider.timeStops.length-1;
         timeSlider.bins = [];
         timeSlider.startup();
