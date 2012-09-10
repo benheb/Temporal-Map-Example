@@ -82,7 +82,7 @@ button#hideOverview {
   overflow: visible;
   border: none;
   float: left;
-  background-image: url("/timeline/images/hide.png");
+  background-image: url("../img/hide.png");
   margin-right: 5px;
   margin-top:0px;
 }
@@ -92,16 +92,16 @@ div#playModeChooser {
 }
 
 button#hideOverview:hover {
-  background-image: url("/timeline/images/hide_over.png");
+  background-image: url("../img/hide_over.png");
 }
 
 button#hideOverview.show {
   width: 37px;
-  background-image: url("/timeline/images/show.png");
+  background-image: url("../img/show.png");
 }
 
 button#hideOverview.show:hover {
-  background-image: url("/timeline/images/show_over.png");
+  background-image: url("../img/show_over.png");
 }
 
 
@@ -111,13 +111,22 @@ button#play {
   cursor: pointer;
   float: left;
 }
+.tsPlayButton{
+  width: 18px !important;
+  height: 18px !important;
+  overflow: visible !important;
+  border: none !important;
+  margin-top: 3px !important;
+  background-image: url("../img/play.png") !important;  
+  float: left !important;
+}
 div#playInternal {
   width: 18px;
   height: 18px;
   overflow: visible;
   border: none;
   margin-top: 3px;
-  background-image: url("/timeline/images/play.png");  
+  background-image: url("../img/play.png");  
   float: left;
 }
 
@@ -126,15 +135,15 @@ div#playInternal {
 }
 
 div#playInternal.pause {
-  background-image: url("/timeline/images/pause.png");
+  background-image: url("../img/pause.png");
 }
 
 button#play:hover div#playInternal {
-  background-image: url("/timeline/images/play_over.png");  
+  background-image: url("../img/play_over.png");  
 }
 
 button#play:hover div#playInternal.pause {
-  background-image: url("/timeline/images/pause_over.png");
+  background-image: url("../img/pause_over.png");
 }
 
 button#play:hover h1#temporalTitle {
@@ -160,19 +169,19 @@ button#page_right {
 }
 
 button#page_left {
-  background-image: url("/timeline/images/page_left.png");  
+  background-image: url("../img/page_left.png");  
 }
 
 button#page_right {
-  background-image: url("/timeline/images/page_right.png"); 
+  background-image: url("../img/page_right.png"); 
 }
 
 button#page_right:hover {
-  background-image: url("/timeline/images/page_right_over.png"); 
+  background-image: url("../img/page_right_over.png"); 
 }
 
 button#page_left:hover {
-  background-image: url("/timeline/images/page_left_over.png"); 
+  background-image: url("../img/page_left_over.png"); 
 }
 
 div#focusContainer {
@@ -307,19 +316,19 @@ button#show_hide {
 
 
 button#show_hide.show {
-  background-image: url("/timeline/images/max.png");
+  background-image: url("../img/max.png");
 }
 
 button#show_hide.show:hover {
-  background-image: url("/timeline/images/max_over.png");
+  background-image: url("../img/max_over.png");
 }
 
 button#show_hide.hide {
-  background-image: url("/timeline/images/min.png");
+  background-image: url("../img/min.png");
 }
 
 button#show_hide.hide:hover {
-  background-image: url("/timeline/images/min_over.png");
+  background-image: url("../img/min_over.png");
 }
 
 button.fg-button {
