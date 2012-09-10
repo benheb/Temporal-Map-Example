@@ -236,6 +236,8 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
       
         x = ( bin.timestamp.getTime() - this.overviewTimespan.min ) / overviewRange * this.overviewCanvas.width;
         console.log('x: ', x)
+        if (i != 0) {x = x - 20.3} //hacky fix for temporary 
+        
         h = ( this.overviewCanvas.height - 5 ) * bin.count / maxCount;
         y = this.overviewCanvas.height - h;
         var bar = this.overviewCanvas.rect( x, y, bucket_width - gap, h ); // .attr({fill: "#ddd", 'stroke': 'none'});
