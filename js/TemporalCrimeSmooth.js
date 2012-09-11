@@ -133,7 +133,7 @@
         timeExtent.startTime = new Date("2002/06/01 00:04:00 UTC");
         timeExtent.endTime = new Date("2002/06/29 23:59:00 UTC");
         timeSlider.setThumbCount(2);
-        timeSlider.createTimeStopsByTimeInterval(timeExtent,7,'esriTimeUnitsHours');
+        timeSlider.createTimeStopsByTimeInterval(timeExtent,7,'esriTimeUnitsDays');
         timeSlider.setThumbIndexes([0,5]);
         timeSlider.setThumbMovingRate(200);
         timeSlider.numberBins = timeSlider.timeStops.length-1;
@@ -192,7 +192,7 @@
         dojo.connect(timeSlider, "onTimeExtentChange", function(timeExtent) {
           var startValString = timeExtent.startTime.getUTCFullYear();
           var endValString = timeExtent.endTime.getUTCFullYear();
-          dojo.byId("daterange").innerHTML = "<i>" + startValString + " and " + endValString  + "<\/i>";
+          //dojo.byId("daterange").innerHTML = "<i>" + startValString + " and " + endValString  + "<\/i>";
         });
       }
       

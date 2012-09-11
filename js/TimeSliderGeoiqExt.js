@@ -468,6 +468,13 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
    * Internal Methods
    *******************/
   _updateUI: function() {
+    if (this.playing) {
+      dojo.query( ".play-mode" ).addClass( "pause" );
+      dojo.byId("temporalTitle").innerHTML = "PAUSE"
+    } else {
+      dojo.query( ".play-mode" ).removeClass( "pause" );
+      dojo.byId("temporalTitle").innerHTML = "PLAY"
+    }
     //dojo.removeClass(this.playPauseBtn.iconNode, this._iconClass);
     //this._iconClass = this.playing ? "tsButton tsPauseButton" : "tsButton tsPlayButton";
     //dojo.addClass(this.playPauseBtn.iconNode, this._iconClass);
