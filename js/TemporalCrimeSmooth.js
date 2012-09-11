@@ -7,6 +7,7 @@
 
 
       var timeSlider; 
+      var crimeLayer;
       
       function init() {
         var startExtent = new esri.geometry.Extent({"xmin":-8381753.575299095,"ymin":4864602.340301298,"xmax":-8342635.093809094,"ymax":4896425.59837099,"spatialReference":{"wkid":102100}});
@@ -16,7 +17,7 @@
         var basemap = new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer");
         layers.push(basemap);
 
-        var crimeLayer = new esri.layers.FeatureLayer("http://ec2-23-22-185-186.compute-1.amazonaws.com:6080/arcgis/rest/services/PhillyCrime/MapServer/0"
+        crimeLayer = new esri.layers.FeatureLayer("http://ec2-23-22-185-186.compute-1.amazonaws.com:6080/arcgis/rest/services/PhillyCrime/MapServer/0"
                                                         , { mode: esri.layers.FeatureLayer.MODE_SNAPSHOT
                                                            , outFields: ["UCRHundred", "STOLEN_VALUE", "RECOVERED_VALUE", "LOCATION", "STATUS", "MODUS_OPERANDI"] });
         
@@ -133,7 +134,7 @@
         timeExtent.startTime = new Date("2002/06/01 00:04:00 UTC");
         timeExtent.endTime = new Date("2002/06/29 23:59:00 UTC");
         timeSlider.setThumbCount(2);
-        timeSlider.createTimeStopsByTimeInterval(timeExtent,7,'esriTimeUnitsDays');
+        timeSlider.createTimeStopsByTimeInterval(timeExtent,7,'esriTimeUnitsHours');
         timeSlider.setThumbIndexes([0,5]);
         timeSlider.setThumbMovingRate(200);
         timeSlider.numberBins = timeSlider.timeStops.length-1;
@@ -143,57 +144,68 @@
         //total bins: 
         dojo.byId("totalbins").innerHTML = timeSlider.timeStops.length-1;
 
-        for(var i=0;i<timeSlider.timeStops.length-1;i++) {
-          var loadCnt = 0,
-            time0 = timeSlider.timeStops[i],
-            time0 = new Date(time0).getTime(),
-            time1 = timeSlider.timeStops[i+1],
-            time1 = new Date(time1).getTime()
-
-          //get counts for each BIN
-          var targetNode = dojo.byId("binonecount");
-           var getCounts = {
-             url: "http://ec2-23-22-185-186.compute-1.amazonaws.com:6080/arcgis/rest/services/PhillyCrime/MapServer/0/query?where=1=1&time="+time0+","+time1+"&returnCountOnly=true&f=json",
-             callbackParamName: "callback",
-             content: {
-               v: "1.0",
-               q: "dojo toolkit"
-             },
-             load: function(data){
-               loadCnt++;
-               
-               var timestamp = timeSlider.timeStops[loadCnt];
-               var utc = new Date(timestamp).getTime();
-               
-               timeSlider.bins.push({"count": data['count'], "timestamp": timestamp, 'utc': utc});
-               
-               //pass array of counts to slider when finished
-               if (loadCnt==timeSlider.timeStops.length-1) {timeSlider.initSlider()};
-               dojo.create("span", { innerHTML: data['count'] + ","}, targetNode, "before");
-             },
-             error: function(error){
-               targetNode.innerHTML = "An unexpected error occurred: " + error;
-             }
-           };
-           dojo.io.script.get(getCounts);
-        }
+        console.log('crimeLayer: ', crimeLayer, crimeLayer.graphics[10], crimeLayer.graphics.length)
+        
+        //wait until features array as length, then calculate bins
+        setTimeout(function(){
+          if (!crimeLayer.graphics.length){
+            setTimeout(arguments.callee, 25);
+            return;
+          } 
+          // else 
+          calculateBins();
+        }, 0)
         
         //add labels for every other time stop
-        var labels = dojo.map(timeSlider.timeStops, function(timeStop,i){ 
+        /*var labels = dojo.map(timeSlider.timeStops, function(timeStop,i){ 
           if(i%2 === 0){
             return timeStop.getUTCHours(); }
           else{
             return "";
           }
-        });      
+        });*/      
         
-        timeSlider.setLabels(labels);
+        //timeSlider.setLabels(labels);
         
         dojo.connect(timeSlider, "onTimeExtentChange", function(timeExtent) {
           var startValString = timeExtent.startTime.getUTCFullYear();
           var endValString = timeExtent.endTime.getUTCFullYear();
           //dojo.byId("daterange").innerHTML = "<i>" + startValString + " and " + endValString  + "<\/i>";
         });
+      }
+      
+      function calculateBins() {
+        var timeStops = [];
+        var times = [];
+        for(i=0;i<timeSlider.timeStops.length-1;i++) {
+          timeStops[i] = timeSlider.timeStops[i].getTime();
+          timeSlider.bins.push({"count": 0, "timestamp": timeSlider.timeStops[i], 'utc': timeStops[i]});
+        }
+        
+        var features = crimeLayer.graphics;
+        var test = 0;
+        var first_time = timeStops[0];
+        for(var i=0;i<features.length;i++) {
+          var fTime =  features[i].attributes.DISPATCH_DATE_TIME;
+          for(var j=0;j<=timeStops.length;j++) {
+            if (j != timeStops.length - 1) {
+              if (fTime >= first_time && fTime <= timeStops[j]) {
+                timeSlider.bins[j-1].count++;
+              };
+            } else {
+              if (fTime >= first_time && fTime <= timeStops[j]) {
+                timeSlider.bins[j-1].count++;
+              };
+            }
+            if(j == timeStops.length) {
+              if(fTime >= timeStops[timeStops.length]) timeSlider.bins[j-1].count++;
+            }
+            first_time = timeStops[j];
+          };
+        };
+        
+        //init slider
+        timeSlider.initSlider()
       }
       
       function updateSlider() {
