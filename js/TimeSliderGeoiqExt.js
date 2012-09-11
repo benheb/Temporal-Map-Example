@@ -73,12 +73,12 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
   
   // years, months, days, hours, minutes
   _resolutions: {
-    "second"  : 1000,
-    "minute"  : 1000*60,
+    "esriTimeUnitsSeconds"  : 1000,
+    "esriTimeUnitsMinutes"  : 1000*60,
     "esriTimeUnitsHours"    : 1000*60*60,
     "esriTimeUnitsDays"     : 1000*60*60*24,
     "esriTimeUnitsMonths"   : 1000*60*60*24*30,
-    "year"    : 1000*60*60*24*365
+    "esriTimeUnitsYears"    : 1000*60*60*24*365
   },
   
   initSlider: function() {
@@ -167,6 +167,7 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
     this._onHorizontalChange();
     this._addBins(bins, res);
     this._drawOverview();
+    this._updateChartAnnotation( this.overviewAnnotationCanvas, this.overviewTimespan, 5, "#DDD" );
     this._updateFocusIndicators();
   },
   
@@ -213,6 +214,41 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
       if (!reload) {
         this.focusBarSets = {};
       }
+    },
+    
+    /**
+     * returns the next _coarsest_ resolution compared to the passed-in resolution
+     */
+    _next_resolution: function(resolution) {
+      var next = false;
+      var last_res;
+      //jq.each(this._resolutions, function(name, val) {
+      for (i=0;i<this._resolutions;i++) { 
+          last_res = this._resolutions[i];
+          if (next) {
+            return false;            
+          } 
+          if (resolution == this._resolutions[i]) {
+            next = true;
+          }
+      };
+      return last_res;
+    },
+    
+    /**
+     * returns the next _finest_ resolution compared to the passed-in resolution
+     */
+    _prev_resolution : function(resolution)
+    {
+      var prev_res;
+      for (i=0;i<this._resolutions;i++) { 
+        if ( resolution == this._resolutions[i] )
+        {
+          return false;
+        }
+        prev_res = this._resolutions[i];
+      };
+      return prev_res;
     },
     
     _addBins : function( bins, resolution )
@@ -319,9 +355,32 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
       this.focusTimespan.min = min;
       this.focusTimespan.max = max;
       this._updateFocusHighlight();
-      //this._updateFocusDateRangeText();
+      this._updateFocusDateRangeText();
     }, 
       
+    _updateFocusDateRangeText : function() {
+      if (!this.focusTimespan) return;
+      var dateRange = this._getDateRangeText( this.focusTimespan, false );
+      dojo.byId( 'focusRange' ).innerHTML = dateRange;
+    },  
+      
+    _getDateRangeText : function( timespan, asLinks )
+    {
+      var beginDate = new Date( timespan.min );
+      var endDate = new Date( timespan.max );
+      var diff = timespan.max - timespan.min;
+      
+      var dateString = this._getDateText( beginDate, timespan, asLinks );
+      dateString += ' to ';
+      dateString += this._getDateText( endDate, timespan, asLinks );
+      
+      if ( diff < ( .25 * this._resolutions[ 'month' ] ) )
+      {
+        dateString += ' GMT';
+      }
+      return dateString;
+    },
+    
     _updateFocusHighlight : function() {
       var x, width;
       
@@ -338,7 +397,208 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
       this.obscuringBars[2].attr( { "x" : x, "width" : width } );
     },
     
+    _getDateText : function( date, timespan, asLink )
+    {
+      var beginDate = new Date( timespan.min );
+      var endDate = new Date( timespan.max );
+      var formattedDate = asLink ? '<a href="">' : '';
+      
+      formattedDate += '<span class="dateText">';
+      
+      var isFirst = ( date.getTime() == timespan.min );
+      var diff = timespan.max - timespan.min;
+      
+      // if our range is less than a month, start with the day name
+      if ( diff < this._resolutions['esriTimeUnitsMonths'] && ( isFirst || ( diff > this._resolutions['esriTimeUnitsDays'] || ( beginDate.getDate() != endDate.getDate() ) ) ) )
+      {
+        formattedDate += date.toDateString().split(' ')[0] + ' ';
+      }
+      
+      if ( diff < ( 10 * this._resolutions[ 'esriTimeUnitsYears' ] ) && ( isFirst || ( diff > this._resolutions['esriTimeUnitsDays'] || ( beginDate.getDate() != endDate.getDate() ) ) ) )
+      {
+        formattedDate += date.getMonth() + 1 + '/' + date.getDate() + '/';
+      }     
+      
+      if ( isFirst || ( diff > this._resolutions['esriTimeUnitsDays'] || ( beginDate.getDate() != endDate.getDate() ) ) )
+      {
+        formattedDate += date.getFullYear();
+      }
+      
+      var showTime = ( diff < ( .25 * this._resolutions[ 'esriTimeUnitsMonths' ] ) );
+      if ( showTime )
+      {       
+        if ( isFirst || diff > this._resolutions['esriTimeUnitsDays'] || ( beginDate.getDate() != endDate.getDate() ) )
+        {
+          formattedDate += ' at ';
+        }
+        
+        formattedDate += date.toTimeString().substr(0,5);
+        
+        if ( diff < ( .25 * this._resolutions['esriTimeUnitsHours'] ) )
+        {
+          formattedDate += date.toTimeString().substr(5,3);
+        }
+      }
+      
+      formattedDate += '</span>';
+      if ( asLink )
+      {
+        formattedDate += '</a>';
+      }
+      
+      return formattedDate;
+    },
     
+    /**
+     * update the background chart ticks and labels for the focus histogram
+     */
+    _updateChartAnnotation : function( canvas, timespan, maxTicks, color )
+    {
+      if ( !maxTicks ) maxTicks = 10;
+      if ( !color ) color = "#ddd";
+      
+      canvas.clear();
+      
+      var res = timeSlider._timeIntervalUnits;
+      
+      var range = timespan.max - timespan.min;      
+      
+      while ( ( range / 2 ) < this._resolutions[ res ] )
+      {
+        res = this._prev_resolution( res );
+        if ( !res ) break;
+      }
+      
+      // now, how many of these are in our focus
+      var num = range / this._resolutions[ res ];
+      
+      var incs, increment;
+      var beginDate = new Date( timespan.min );
+      
+      var firstStamp;
+      
+      // we need to figure out the first actual time-point in this range at the specified resolution
+      if (!res) res = 'esriTimeUnitsHours';
+      switch ( res )
+      {
+        case "esriTimeUnitsSeconds":
+          if ( num < maxTicks )
+          {
+            firstStamp = new Date( beginDate.getFullYear(), beginDate.getMonth(), beginDate.getDate(), beginDate.getHours(), beginDate.getMinutes(), beginDate.getSeconds() );
+          }
+          else
+          {
+            incs = [2,5,10,15,30];
+          }
+          break;
+        case "esriTimeUnitsMinutes":
+          if ( num < maxTicks )
+          {
+            firstStamp = new Date( beginDate.getFullYear(), beginDate.getMonth(), beginDate.getDate(), beginDate.getHours(), beginDate.getMinutes() );
+          }
+          else
+          {
+            incs = [2,5,10,15,30];
+          }
+          break;
+        case "esriTimeUnitsHours":
+          if ( num < maxTicks )
+          {
+            firstStamp = new Date( beginDate.getFullYear(), beginDate.getMonth(), beginDate.getDate(), beginDate.getHours() );
+          }
+          else
+          {
+            incs = [2,6,12];
+          }
+          break;
+        case "esriTimeUnitsDays":
+          if ( num < maxTicks )
+          {
+            firstStamp = new Date( beginDate.getFullYear(), beginDate.getMonth(), beginDate.getDate() );
+          }
+          else 
+          {
+            incs = [2,7];
+          }
+          break;
+        case "esriTimeUnitsMonths":
+          if ( num < maxTicks )
+          {
+            firstStamp = new Date( beginDate.getFullYear(), beginDate.getMonth() );
+          }
+          else
+          {
+            incs = [2,6];
+          }
+          break;
+        case "esriTimeUnitsYears":
+          firstStamp = new Date();
+          if ( num < maxTicks )
+          {
+            firstStamp.setYear( beginDate.getFullYear() );
+          }
+          else
+          {
+            incs = [2,5,10,20,25,50,100];
+          }
+          break;
+      }
+      
+      if ( num < maxTicks ) {
+        increment = this._resolutions[ res ];
+      } else {
+        for ( var i = 0; i < incs.length; i++ ) {
+          if ( ( range / ( this._resolutions[ res ] * incs[i] ) ) < maxTicks ) {
+            break;
+          }
+        }
+        switch ( res )
+        {
+          case "esriTimeUnitsSeconds":
+            firstStamp = new Date( beginDate.getFullYear(), beginDate.getMonth(), beginDate.getDate(), beginDate.getHours(), beginDate.getMinutes(), Math.floor( beginDate.getSeconds() / incs[i] ) * incs[i] );
+            break;
+          case "esriTimeUnitsMinutes":
+            firstStamp = new Date( beginDate.getFullYear(), beginDate.getMonth(), beginDate.getDate(), beginDate.getHours(), Math.floor( beginDate.getMinutes() / incs[i] ) * incs[i] );
+            break;
+          case "esriTimeUnitsHours":
+            firstStamp = new Date( beginDate.getFullYear(), beginDate.getMonth(), beginDate.getDate(), Math.floor( beginDate.getHours() / incs[i] ) * incs[i] );
+            break;
+          case "esriTimeUnitsDays":
+            firstStamp = new Date( beginDate.getFullYear(), beginDate.getMonth(), Math.floor( beginDate.getDate() / incs[i] ) * incs[i] );
+            break;
+          case "esriTimeUnitsMonths":
+            firstStamp = new Date( beginDate.getFullYear(), Math.floor( beginDate.getMonth() / incs[i] ) * incs[i] );
+            break;
+          case "esriTimeUnitsYears":
+            firstStamp.setYear( Math.floor( beginDate.getFullYear() / incs[i] ) * incs[i] );
+            break;
+        }
+        
+        increment = this._resolutions[ res ] * incs[i];
+      }
+      
+      var tickTime = firstStamp.getTime();
+      var x, tickLabel, date;
+      while ( tickTime < timespan.max )
+      {
+        // draw this tick
+        x = ( tickTime - timespan.min ) / range * canvas.width;
+        canvas.path("M" + x + " 5L" + x + " " + canvas.height ).attr({"stroke" : color});
+        date = new Date( tickTime );
+          
+        // label
+        tickLabel = (( res == 'esriTimeUnitsMonths' || res == 'esriTimeUnitsDays' ) ? ( date.getMonth() + 1 + '/' + date.getDate() + '/' ) : '') + 
+              (( res == 'esriTimeUnitsMonths' || res == 'esriTimeUnitsDays' || res == 'esriTimeUnitsYears' ) ? date.getFullYear() : '') + 
+              (( res == 'esriTimeUnitsHours' || res == 'esriTimeUnitsMinutes' || res == 'esriTimeUnitsSeconds' ) ? (' ' + date.toTimeString().substr(0,5)) : '') +
+              (( res == 'esriTimeUnitsSeconds' ) ? (':' + date.getSeconds()) : '');
+          
+        // add the label
+        canvas.text( x+5, 15, tickLabel ).attr( { "font-size" : "12px",'text-anchor':'start', 'fill' : color } );
+          
+        // and add a unit of time
+        tickTime += increment;
+      }
+    },
   /*****************
    * Events
    *****************/
