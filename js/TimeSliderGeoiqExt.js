@@ -161,10 +161,13 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
     this.overviewTimespan.min = bins[0].utc;
     this.overviewTimespan.max = bins[bins.length-1].utc;
     
-    dojo.byId('overviewRangeSpan').innerHTML = bins[0].timestamp + ' - ' +  bins[bins.length-1].timestamp
+    this.focusTimespan = this._getInitialFocusTimespan();
     
+    dojo.byId('overviewRangeSpan').innerHTML = bins[0].timestamp + ' - ' +  bins[bins.length-1].timestamp
+    this._onHorizontalChange();
     this._addBins(bins, res);
     this._drawOverview();
+    this._updateFocusIndicators();
   },
   
   setPlayMode : function( mode ) {
@@ -260,11 +263,9 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
       for ( var i = 0; i < bins.length; i++ )
       {
         bin = bins[i];
-        console.log('bin', bin)
         if ( !bin ) continue;
       
         x = ( bin.timestamp.getTime() - this.overviewTimespan.min ) / overviewRange * this.overviewCanvas.width;
-        console.log('x: ', x)
         if (i != 0) {x = x - 20.3} //hacky fix for temporary 
         
         h = ( this.overviewCanvas.height - 5 ) * bin.count / maxCount;
@@ -298,6 +299,46 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
       this.highlightBars.attr( { 'clip-rect' : '600,0,100,100' } );
     },
   
+    /**
+     * gets an initial timespan, prior to any user interaction
+     */
+    _getInitialFocusTimespan : function() {
+      var max = this.overviewTimespan.min + ( .075 * ( this.overviewTimespan.max - this.overviewTimespan.min ) );
+      
+      return {
+        min : this.overviewTimespan.min,
+        max : max
+      };
+    },
+    
+     _updateFocusIndicators : function() {
+      if (!this.focusTimespan) return;
+      var curExtent = this.getCurrentTimeExtent();
+      var min = curExtent.startTime.getTime(),
+        max = curExtent.endTime.getTime();
+      this.focusTimespan.min = min;
+      this.focusTimespan.max = max;
+      this._updateFocusHighlight();
+      //this._updateFocusDateRangeText();
+    }, 
+      
+    _updateFocusHighlight : function() {
+      var x, width;
+      
+      x = ( this.focusTimespan.min - this.overviewTimespan.min ) / ( this.overviewTimespan.max - this.overviewTimespan.min ) * this.overviewCanvas.width;
+      width = ( this.focusTimespan.max - this.focusTimespan.min ) / ( this.overviewTimespan.max - this.overviewTimespan.min ) * this.overviewCanvas.width;
+      
+      var clipString = x + ',' + 0 + ',' + width + ',' + 100;
+      
+      this.highlightBars.attr( { 'clip-rect' : clipString } );
+      
+      // now update our obscuring bars
+      this.obscuringBars[0].attr( { "width" : x } );
+      this.obscuringBars[1].attr( { "x" : x + width, "width" : (this.overviewCanvas.width) - (x+width) } );
+      this.obscuringBars[2].attr( { "x" : x, "width" : width } );
+    },
+    
+    
   /*****************
    * Events
    *****************/
@@ -310,9 +351,11 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
   /*****************
    * Event Listeners
    *****************/
+  
   _onHorizontalChange: function() {
     var timeExtent = this._sliderToTimeExtent();
     this.onTimeExtentChange(timeExtent);
+    this._updateFocusIndicators();
     //console.log("StartTime: " + timeExtent.startTime);
     //console.log("EndTime: " + timeExtent.endTime);
   },
@@ -323,9 +366,11 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
     if (this.playing) {
       this._timer.start();
       this.onPlay(this._sliderToTimeExtent());
+      this._updateFocusIndicators();
     } else {
       this._timer.stop();
       this.onPause(this._sliderToTimeExtent());
+      this._updateFocusIndicators();
     }
     var val = this._getSliderValue();
     this._offset = dojo.isArray(val) ? (val[1] - val[0]) : 0;
@@ -335,6 +380,7 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
     if (!this.playing) {
       this._bumpSlider(1);
       this.onNext(this._sliderToTimeExtent());
+      this._updateFocusIndicators();
     }
   },
   
@@ -342,6 +388,7 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
     if (!this.playing) {
       this._bumpSlider(-1);
       this.onPrevious(this._sliderToTimeExtent());
+      this._updateFocusIndicators();
     }
   },
   
@@ -503,6 +550,7 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
       onChange: dojo.hitch(this, "_onHorizontalChange"),
       showButtons: false,
       discreteValues: this._numStops,
+      intermediateChanges:"true",
       slideDuration: this._slideDuration,
       'class': "ts",
       id: "ts",
@@ -600,7 +648,6 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
     } else {
       this._setSliderValue(t1);
     }
-    this._onHorizontalChange();
   },
   
   _bumpSlider: function(dir) {
@@ -665,13 +712,6 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
     }
     
     return retVal;
-  },
-  
-  _binData: function() {
-    if (!this.timeStops || this.timeStops.length === 0) {
-      return;
-    }
-    console.log('timeSlider.countPerBin', timeSlider.bins)
   },
   
   _adjustTimeExtent: function(timeExtent) {

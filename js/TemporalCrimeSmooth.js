@@ -56,7 +56,6 @@
         });
         crimeLayer.setRenderer(renderer);
         // end categorical styling
-        console.log(crimeLayer);
         layers.push(crimeLayer);
 
         //add all the layers to the map then initialize the slider
@@ -144,8 +143,6 @@
         //total bins: 
         dojo.byId("totalbins").innerHTML = timeSlider.timeStops.length-1;
 
-        console.log('crimeLayer: ', crimeLayer, crimeLayer.graphics[10], crimeLayer.graphics.length)
-        
         //wait until features array as length, then calculate bins
         setTimeout(function(){
           if (!crimeLayer.graphics.length){
@@ -164,8 +161,8 @@
             return "";
           }
         });*/      
-        
-        //timeSlider.setLabels(labels);
+        labels = null;
+        timeSlider.setLabels(labels);
         
         dojo.connect(timeSlider, "onTimeExtentChange", function(timeExtent) {
           var startValString = timeExtent.startTime.getUTCFullYear();
