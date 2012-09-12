@@ -378,7 +378,6 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
     _checkCurrentFocusResolution : function()
     {
       var binsInFocus = ( this.focusTimespan.max - this.focusTimespan.min ) / this._resolutions[ this.focusResolution ];
-      
       if ( binsInFocus < 1 )
       {
         if ( this.focusBarSets[ this.focusResolution ] ) { this.focusBarSets[ this.focusResolution ].hide(); }
@@ -448,6 +447,39 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
       this.obscuringBars[2].attr( { "x" : x, "width" : width } );
     },
     
+    
+    _getSingleDateText : function( date, resolution )
+    {
+      var dateText = '';
+      
+      if ( resolution == 'esriTimeUnitsDays' )
+      {
+        dateText += date.toDateString().split(' ')[0] + ' ';
+      }
+      if ( resolution == 'esriTimeUnitsMonths' || resolution == 'esriTimeUnitsDays' )
+      {
+        dateText += date.getMonth() + 1 + '/';
+      }
+      if ( resolution == 'esriTimeUnitsDays' )
+      {
+        dateText += date.getDate() + '/';
+      }
+      if ( resolution == 'esriTimeUnitsDays' || resolution == 'esriTimeUnitsMonths' || resolution == 'esriTimeUnitsYears' )
+      {
+        dateText += date.getFullYear();
+      }
+      if ( resolution == 'esriTimeUnitsHours' || resolution == 'esriTimeUnitsMinutes' || resolution == 'esriTimeUnitsSeconds' )
+      {
+        dateText += date.toTimeString().substr(0,5);
+      }
+      if ( resolution == 'esriTimeUnitsSeconds' )
+      {
+        dateText += date.toTimeString().substr(5,3);
+      }
+      
+      return dateText;
+    },
+    
     _getDateText : function( date, timespan, asLink )
     {
       var beginDate = new Date( timespan.min );
@@ -500,15 +532,47 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
       return formattedDate;
     },
     
+    hideTipForFocusBin : function()
+    {
+      dojo.byId( "focusTip" ).style.display = 'none'; 
+    },
+    
+    /**
+     * display a tool tip for a particular focus bin
+     */
+    showTipForFocusBin : function( bin )
+    {
+      dojo.byId( "focusTip" ).innerHTML = ( this._getSingleDateText( bin.timestamp, this.focusResolution ) + ': ' + bin.count + ' features' );
+      dojo.byId( "focusTip" ).style.display = "block";
+      
+      var x = ( bin.utc - this.focusTimespan.min ) / (this.focusTimespan.max - this.focusTimespan.min) * this.focusCanvas.width;
+      x += .5 * ( this._resolutions[ this.focusResolution ] / ( this.focusTimespan.max - this.focusTimespan.min ) * this.focusCanvas.width );
+      
+      x = Math.min( this.focusCanvas.width - dojo.byId("focusTip").offsetWidth, x );
+      x = Math.max( 1, x );
+            
+      var maxCount = this._maxCounts[this.focusResolution];
+      var h = this.focusCanvas.height * bin.count / maxCount;
+      var y = this.focusCanvas.height - h - dojo.byId( 'focusTip' ).offsetHeight - 15;
+      
+      y = Math.max( 1, y );
+      
+      var focustip = dojo.byId( "focusTip" )         
+      dojo.style(focustip, {
+        'left': x + 'px',
+        'top': y + 'px'
+        });
+    },
+    
     _updateFocusResolutions : function()
     {
       var self = this;
       
-      /*jq.each( this._resolutions, function( res, ms )
-      {
-        var binsInFocus = ( self.focusTimespan.max - self.focusTimespan.min ) / ms;
+      //jq.each( this._resolutions, function( res, ms )
+      for(i=0;i<this._resolutions.length;i++) {
+        var binsInFocus = ( self.focusTimespan.max - self.focusTimespan.min ) / i;
         
-        var $button = jq( "div#resolutionChooser button#"+res); // [value='" + res + "']" )
+        var $button = dojo.byId( "resolutionChooser button#"+this._resolutions[i]); // [value='" + res + "']" )
           
         // get the button
         if ( binsInFocus < 1 || binsInFocus > self.options.maxFocusBins )
@@ -519,7 +583,7 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
         {
           $button.removeClass( "ui-state-disabled" );
         }
-      });*/
+      };
     },
     
     /**
@@ -701,13 +765,15 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
         this.focusBarSets[ this.focusResolution ].hide();
         var bins = this._bins[this.focusResolution];
         var overviewRange = this.overviewTimespan.max - this.overviewTimespan.min;
-        var focusRange = this.focusTimespan.max - this.focusTimespan.min;
+        var focusRange = this.focusTimespan.max - this.focusTimespan.min;ion)
         var res = this._resolutions[this.focusResolution];
         var maxCount = this._maxCounts[this.focusResolution];
         var bucket_width = Math.max( 1, this.focusCanvas.width / ( focusRange / res ));
         var gap = Math.min( 5, Math.floor( bucket_width / 5 ) );
         var mindex = Math.floor( ( this.focusTimespan.min - this.overviewTimespan.min ) / res );
         var maxdex = Math.ceil( ( this.focusTimespan.max - this.overviewTimespan.min ) / res );
+        mindex = 0;
+        maxdex = bins.length;
         var bin, x, y, h;
         if (bins){
           for ( var i = mindex; i < maxdex; i++ ){
@@ -780,13 +846,13 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
       this._timer.start();
       this.onPlay(this._sliderToTimeExtent());
       this._updateFocusIndicators();
-      this._timespanDirty = true;
+      //this._timespanDirty = true;
       this._updateFocusRepresentations();
     } else {
       this._timer.stop();
       this.onPause(this._sliderToTimeExtent());
       this._updateFocusIndicators();
-      this._timespanDirty = true;
+      //this._timespanDirty = true;
       this._updateFocusRepresentations();
     }
     var val = this._getSliderValue();
