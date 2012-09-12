@@ -765,7 +765,7 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
         this.focusBarSets[ this.focusResolution ].hide();
         var bins = this._bins[this.focusResolution];
         var overviewRange = this.overviewTimespan.max - this.overviewTimespan.min;
-        var focusRange = this.focusTimespan.max - this.focusTimespan.min;ion)
+        var focusRange = this.focusTimespan.max - this.focusTimespan.min;
         var res = this._resolutions[this.focusResolution];
         var maxCount = this._maxCounts[this.focusResolution];
         var bucket_width = Math.max( 1, this.focusCanvas.width / ( focusRange / res ));
