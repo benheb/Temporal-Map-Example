@@ -151,6 +151,17 @@ dojo.declare("myModules.TimeSliderGeoiqExt", [dijit._Widget, dijit._Templated], 
     dojo.connect(cumulative, "onclick", function( event ) {
       self.setPlayMode( event.target.value );
     });
+    
+    // dojo.connect(crimeLayer, "onMouseOver", openDialog);
+    dojo.byId( "resolutionChooser" ).style.display = "none";
+    var focuscharthold = dojo.byId( "focusChartHolder" ); 
+    dojo.connect(focuscharthold, "onMouseOver", function() {
+      dojo.byId( "resolutionChooser" ).style.display = "block";
+    });
+    
+    dojo.connect(focuscharthold, "onMouseOut", function() {
+      dojo.byId( "resolutionChooser" ).style.display = "none";
+    });
   },
   
   _onTemporalReady: function( ) {
